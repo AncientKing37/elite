@@ -1,6 +1,6 @@
 // /app/page.js
 import Hero from "@/components/hero";
-import MarketplaceIntro from "@/components/marketplaceIntro";
+import MarketplaceIntro from "@/components/marketplaceintro";
 import Featured from "@/components/featured";
 import Footer from "@/components/footer";
 
