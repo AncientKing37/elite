@@ -1,8 +1,8 @@
 // /app/page.js
-import Hero from "@/components/Hero";
-import MarketplaceIntro from "@/components/MarketplaceIntro";
-import Featured from "@/components/Featured";
-import Footer from "@/components/Footer";
+import Hero from "@/components/hero";
+import MarketplaceIntro from "@/components/marketplaceIntro";
+import Featured from "@/components/featured";
+import Footer from "@/components/footer";
 
 export default function Home() {
   return (
