@@ -20,6 +20,8 @@ export default function AuthForm({ type }) {
       ? { email, password, username }
       : { email, password }
 
+    console.log(`Submitting to ${endpoint}`, body)
+
     try {
       const res = await fetch(endpoint, {
         method: 'POST',
@@ -29,21 +31,27 @@ export default function AuthForm({ type }) {
         body: JSON.stringify(body),
       })
 
-      const data = await res.json()
+      const text = await res.text()
+      console.log(`Raw response from ${endpoint}:`, text)
+
+      let data
+      try {
+        data = JSON.parse(text)
+      } catch (err) {
+        throw new Error('Invalid JSON response from server')
+      }
 
       if (!res.ok) {
         setError(data.error || `${type} failed`)
         return
       }
 
-      // Save token and username
       localStorage.setItem('token', data.token)
       localStorage.setItem('username', data.username || 'User')
 
-      // Redirect to dashboard or homepage
       router.replace('/dashboard')
     } catch (err) {
-      console.error(err)
+      console.error('Submit error:', err)
       setError('Something went wrong. Please try again.')
     }
   }
