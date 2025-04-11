@@ -10,24 +10,34 @@ export async function POST(req) {
     await connectDB();
     console.log("[LOGIN] DB connected.");
 
-    const { email, password } = await req.json();
+    let body;
+    try {
+      body = await req.json();
+    } catch (err) {
+      console.error("[LOGIN] Failed to parse JSON body");
+      return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
+    }
+
+    const { email, password } = body || {};
+
+    if (!email || !password) {
+      return NextResponse.json({ error: "Email and password required" }, { status: 400 });
+    }
+
     console.log("[LOGIN] Request body:", { email });
 
-    // Check if user exists
     const user = await User.findOne({ email });
     if (!user) {
       console.log("[LOGIN] User not found for email:", email);
       return NextResponse.json({ error: "Email not registered" }, { status: 404 });
     }
 
-    // Compare password
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       console.log("[LOGIN] Invalid password for user:", email);
       return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
     }
 
-    // Sign JWT with user ID and username
     const token = jwt.sign(
       { userId: user._id, username: user.username },
       process.env.JWT_SECRET,
