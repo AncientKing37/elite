@@ -6,18 +6,24 @@ import User from "@/models/user";
 
 export async function POST(req) {
   try {
+    console.log("[LOGIN] Connecting to MongoDB...");
     await connectDB();
+    console.log("[LOGIN] DB connected.");
+
     const { email, password } = await req.json();
+    console.log("[LOGIN] Request body:", { email });
 
     // Check if user exists
     const user = await User.findOne({ email });
     if (!user) {
+      console.log("[LOGIN] User not found for email:", email);
       return NextResponse.json({ error: "Email not registered" }, { status: 404 });
     }
 
     // Compare password
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
+      console.log("[LOGIN] Invalid password for user:", email);
       return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
     }
 
@@ -27,15 +33,15 @@ export async function POST(req) {
       process.env.JWT_SECRET,
       { expiresIn: "7d" }
     );
+    console.log("[LOGIN] JWT token created.");
 
-    // Send token + user info
     return NextResponse.json({
       token,
       userId: user._id,
       username: user.username
     });
   } catch (err) {
-    console.error(err);
+    console.error("[LOGIN ERROR]", err);
     return NextResponse.json({ error: "Login failed" }, { status: 500 });
   }
 }
